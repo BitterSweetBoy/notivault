@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Session, User } from '@prisma/client';
 import { randomBytes } from 'crypto';
-
-const SESSION_TTL = 1000 * 60 * 60; // 1 hora
+import { SESSION_TTL } from './constants';
 
 @Injectable()
 export class SessionService {
@@ -14,7 +13,7 @@ export class SessionService {
     const ticketData = JSON.stringify({ userId });
 
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + 1000 * 60 * 60);
+    const expiresAt = new Date(now.getTime() + SESSION_TTL);
 
     const session = await this.prisma.session.create({
       data: {
@@ -75,36 +74,37 @@ export class SessionService {
     });
   }
 
-  async maybeRenewSession(sessionKey: string): Promise<boolean> {
+  async maybeRenewSession(sessionKey: string): Promise<string | null> {
     const session = await this.prisma.session.findUnique({
       where: { sessionKey },
     });
-    if (!session) return false;
+    if (!session) return null;
 
     const now = new Date();
     const expiresAt = new Date(session.expiresAt);
     const diffMs = expiresAt.getTime() - now.getTime();
 
-    // Si faltan menos de 10 minutos
     if (diffMs <= 1000 * 60 * 10 && diffMs > 0) {
+      const newKey = randomBytes(32).toString('hex');
       const newExpiresAt = new Date(now.getTime() + 1000 * 60 * 60);
+
       await this.prisma.session.update({
         where: { sessionKey },
         data: {
+          sessionKey: newKey,
           expiresAt: newExpiresAt,
           lastActivity: now,
         },
       });
-      return true;
+
+      return newKey;
     }
 
-    // Si aún falta más de 10 minutos, solo actualiza la actividad
     if (diffMs > 0) {
       await this.updateActivity(session.id);
-      return false;
+      return sessionKey;
     }
 
-    // Ya expiró
-    return false;
+    return null;
   }
 }
