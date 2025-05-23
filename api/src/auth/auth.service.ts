@@ -13,9 +13,20 @@ export class AuthService {
     private sessions: SessionService,
   ) {}
 
-  async register(name: string, email: string, password: string): Promise<User> {
+  async register(
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<{ id: string; name: string | null; email: string | null }> {
     const hash = await bcrypt.hash(password, 10);
-    return this.prisma.user.create({ data: { name, email, password: hash } });
+    return this.prisma.user.create({
+      data: { name, email, password: hash },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
   }
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -26,13 +37,22 @@ export class AuthService {
     return user;
   }
 
-  async login(email: string, password: string) {
+  async login(
+    email: string,
+    password: string,
+    userAgent: string,
+    ipAddress: string,
+  ) {
     const user = await this.validateUser(email, password);
-    const session = await this.sessions.createSession(user.id, SESSION_TTL);
-    return { user, sessionId: session.id };
+    const session = await this.sessions.createSession(
+      user.id,
+      userAgent,
+      ipAddress,
+    );
+    return { user, sessionKey: session.sessionKey };
   }
 
-  async logout(sessionId: string) {
-    await this.sessions.deleteSession(sessionId);
+  async logout(sessionKey: string) {
+    await this.sessions.expireSession(sessionKey);
   }
 }

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { Public } from './decorators/public.decorator';
@@ -26,21 +19,33 @@ export class AuthController {
   async login(
     @Body() dto: { email: string; password: string },
     @Res({ passthrough: true }) res: Response,
+    @Req() req: Request,
   ) {
-    const { user, sessionId } = await this.auth.login(dto.email, dto.password);
-    res.cookie('SESSION_ID', sessionId, {
+    const userAgent = req.headers['user-agent'] || '';
+    const ipAddress = req.ip;
+
+    const { user, sessionKey } = await this.auth.login(
+      dto.email,
+      dto.password,
+      userAgent,
+      ipAddress || '',
+    );
+
+    res.cookie('SESSION_ID', sessionKey, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60, // 1 hora
+      secure: true,
     });
+
     return user;
   }
 
   @UseGuards(AuthGuard)
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const sessionId = req.cookies['SESSION_ID'];
-    await this.auth.logout(sessionId);
+    const sessionKey = req.cookies['SESSION_ID'];
+    await this.auth.logout(sessionKey);
     res.clearCookie('SESSION_ID');
   }
 }
