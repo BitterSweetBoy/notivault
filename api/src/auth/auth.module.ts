@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { SessionCleanupService } from './session-cleanup.service';
 
 @Module({
   imports: [PrismaModule],
@@ -12,6 +13,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   providers: [
     AuthService,
     SessionService,
+    SessionCleanupService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
