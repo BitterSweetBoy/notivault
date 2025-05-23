@@ -3,28 +3,31 @@ import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { Public } from './decorators/public.decorator';
 import { AuthGuard } from './guards/auth.guard';
+import { RegisterDto } from './dtos/register.dto';
+import { LoginDto } from './dtos/login.dto';
+import { SESSION_TTL } from './constants';
 
 @Controller()
 export class AuthController {
   constructor(private auth: AuthService) {}
 
-  @Public()
   @Post('register')
-  async register(@Body() dto: { name: string; email: string; password: string }) {
-    return this.auth.register(dto.name, dto.email, dto.password);
+  @Public()
+  async register(@Body() dto: RegisterDto) {
+    return this.auth.register(dto);
   }
 
-  @Public()
   @Post('login')
+  @Public()
   async login(
-    @Body() dto: { email: string; password: string },
+    @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request,
-  ) {
+  ): Promise<{ message: string }> {
     const userAgent = req.headers['user-agent'] || '';
     const ipAddress = req.ip;
 
-    const { user, sessionKey } = await this.auth.login(
+    const sessionKey = await this.auth.login(
       dto.email,
       dto.password,
       userAgent,
@@ -34,11 +37,12 @@ export class AuthController {
     res.cookie('SESSION_ID', sessionKey, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60, // 1 hora
+      maxAge: SESSION_TTL,
       secure: true,
+      signed: true,
     });
 
-    return user;
+    return { message: 'Inicio de sesión exitoso' };
   }
 
   @UseGuards(AuthGuard)

@@ -1,8 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { SessionService } from './session.service';
 import { User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { RegisterDto } from './dtos/register.dto';
 
 const SESSION_TTL = 1000 * 60 * 60 * 12; // 1 día
 
@@ -13,20 +15,30 @@ export class AuthService {
     private sessions: SessionService,
   ) {}
 
-  async register(
-    name: string,
-    email: string,
-    password: string,
-  ): Promise<{ id: string; name: string | null; email: string | null }> {
-    const hash = await bcrypt.hash(password, 10);
-    return this.prisma.user.create({
-      data: { name, email, password: hash },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
-    });
+  async register( dto: RegisterDto,): Promise<{ id: string; name: string | null; email: string | null }> {
+    const { name, email, password } = dto;
+    const hash = await bcrypt.hash(password, 12);
+
+    try {
+      return await this.prisma.user.create({
+        data: { name, email, password: hash },
+        select: { id: true, name: true, email: true },
+      });
+    } catch (err) {
+      if (
+        err instanceof PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+      ) {
+        const targets = Array.isArray(err.meta?.target)
+          ? (err.meta.target as string[])
+          : [];
+
+        if (targets.includes('email')) {
+          throw new ConflictException('El email ya está en uso');
+        }
+      }
+      throw err;
+    }
   }
 
   async validateUser(email: string, password: string): Promise<User> {
