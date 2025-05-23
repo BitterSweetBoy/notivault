@@ -24,9 +24,17 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  id               String    @id @default(uuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id])
+  sessionKey       String    @unique @default("")
+  ticketData       String    @default("{}")      
+  createdAt        DateTime  @default(now())
+  lastActivity     DateTime  @default(now())
+  expiresAt        DateTime
+  isSessionExpired Boolean   @default(false)
+  logoutAt         DateTime?
+  revokedByAdmin   Boolean   @default(false)
+  ipAddress        String?
+  userAgent        String?
 }
