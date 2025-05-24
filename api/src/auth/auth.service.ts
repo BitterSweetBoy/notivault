@@ -5,14 +5,16 @@ import { SessionService } from './session.service';
 import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { RegisterDto } from './dtos/register.dto';
+import { LoginAttemptService } from './login-attempt.service';
+import { MAX_ATTEMPTS, TIME_WINDOW_MS } from './constants';
 
-const SESSION_TTL = 1000 * 60 * 60 * 12; // 1 día
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private sessions: SessionService,
+    private loginAttempts: LoginAttemptService,
   ) {}
 
   async register( dto: RegisterDto,): Promise<{ id: string; name: string | null; email: string | null }> {
@@ -49,19 +51,21 @@ export class AuthService {
     return user;
   }
 
-  async login(
-    email: string,
-    password: string,
-    userAgent: string,
-    ipAddress: string,
-  ) {
-    const user = await this.validateUser(email, password);
-    const session = await this.sessions.createSession(
-      user.id,
-      userAgent,
-      ipAddress,
-    );
-    return { user, sessionKey: session.sessionKey };
+  async login(email: string, password: string, userAgent: string, ipAddress: string) {
+    const attempts = await this.loginAttempts.getRecentFailedAttempts(email, TIME_WINDOW_MS);
+    if (attempts >= MAX_ATTEMPTS) {
+      throw new Error ('Demasiados intentos fallidos. Intenta más tarde.');
+    }
+
+    try {
+      const user = await this.validateUser(email, password);
+      await this.loginAttempts.logAttempt(email, ipAddress, userAgent, true);
+      const session = await this.sessions.createSession(user.id, userAgent, ipAddress);
+      return { user, sessionKey: session.sessionKey };
+    } catch (err) {
+      await this.loginAttempts.logAttempt(email, ipAddress, userAgent, false);
+      throw err;
+    }
   }
 
   async logout(sessionKey: string) {
