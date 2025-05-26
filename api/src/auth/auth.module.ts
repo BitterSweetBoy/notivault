@@ -4,7 +4,7 @@ import { SessionService } from './session.service';
 import { AuthController } from './auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '../prisma/prisma.module';
 import { SessionCleanupService } from './session-cleanup.service';
 import { LoginAttemptService } from './login-attempt.service';
 

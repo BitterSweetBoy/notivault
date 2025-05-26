@@ -6,7 +6,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { SESSION_TTL } from './constants';
-import { getRequestIP } from 'src/common/utils/request-ip.util';
+import { getRequestIP } from '../common/utils/request-ip.util';
 
 @Controller()
 export class AuthController {
