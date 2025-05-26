@@ -38,3 +38,12 @@ model Session {
   ipAddress        String?
   userAgent        String?
 }
+
+model LoginAttempt {
+  id         String   @id @default(uuid())
+  email      String
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+  success    Boolean
+}

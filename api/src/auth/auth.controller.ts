@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Req, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { Public } from './decorators/public.decorator';
@@ -6,6 +6,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { SESSION_TTL } from './constants';
+import { getRequestIP } from 'src/common/utils/request-ip.util';
 
 @Controller()
 export class AuthController {
@@ -25,13 +26,13 @@ export class AuthController {
     @Req() req: Request,
   ): Promise<{ message: string }> {
     const userAgent = req.headers['user-agent'] || '';
-    const ipAddress = req.ip;
+    const ipAddress = getRequestIP(req);
 
-    const sessionKey = await this.auth.login(
+    const { sessionKey } = await this.auth.login(
       dto.email,
       dto.password,
       userAgent,
-      ipAddress || '',
+      ipAddress,
     );
 
     res.cookie('SESSION_ID', sessionKey, {
@@ -48,8 +49,11 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const sessionKey = req.cookies['SESSION_ID'];
+    const sessionKey = req.signedCookies?.SESSION_ID;
+    if (!sessionKey) throw new UnauthorizedException('Sesión no encontrada o inválida');
+
     await this.auth.logout(sessionKey);
     res.clearCookie('SESSION_ID');
+    
   }
 }
