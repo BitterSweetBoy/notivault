@@ -8,7 +8,7 @@ import { LoginDto } from './dtos/login.dto';
 import { SESSION_TTL } from './constants';
 import { getRequestIP } from '../common/utils/request-ip.util';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private auth: AuthService) {}
 
