@@ -1,0 +1,255 @@
+<!-- src/app/register/register.component.html -->
+<div class="min-h-screen flex">
+  <!-- Left Panel -->
+  <div
+    class="hidden lg:flex w-1/2 bg-gradient-to-br from-indigo-600 to-purple-600 items-center justify-center p-10"
+  >
+    <div class="text-white space-y-6 max-w-md">
+      <h1 class="text-4xl font-extrabold">¡Bienvenido!</h1>
+      <p class="text-lg opacity-90">
+        Configura tu conector de <span class="font-semibold">Plane.so</span> a
+        <span class="font-semibold">Mattermost</span> en unos sencillos pasos.
+      </p>
+      <ul class="space-y-2">
+        <li class="flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-white mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Acceso Seguro
+        </li>
+        <li class="flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-white mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2l4 -4"
+            />
+          </svg>
+          Integración Rápida
+        </li>
+        <li class="flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-white mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3"
+            />
+          </svg>
+          Notificaciones en Tiempo Real
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+    <div class="bg-white shadow-2xl rounded-2xl w-full max-w-md p-10">
+      <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-800">
+          Comienza tu configuración
+        </h2>
+      </div>
+      <form
+        [formGroup]="registerForm"
+        (ngSubmit)="onSubmit()"
+        class="space-y-4"
+      >
+        <!-- Nombre -->
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            autocomplete="name"
+            [attr.aria-invalid]="registerForm.get('name')?.invalid"
+            aria-describedby="nameError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                registerForm.get('name')?.touched &&
+                registerForm.get('name')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
+          />
+          <small
+            *ngIf="
+              registerForm.get('name')?.touched &&
+              registerForm.get('name')?.hasError('required')
+            "
+            id="nameError"
+            class="text-red-500"
+          >
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Correo electrónico</label
+          >
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="registerForm.get('email')?.invalid"
+            aria-describedby="emailError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                registerForm.get('email')?.touched &&
+                registerForm.get('email')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
+          />
+          <small
+            *ngIf="
+              registerForm.get('email')?.touched &&
+              registerForm.get('email')?.hasError('required')
+            "
+            id="emailError"
+            class="text-red-500"
+          >
+            El correo es obligatorio.
+          </small>
+          <small
+            *ngIf="
+              registerForm.get('email')?.touched &&
+              registerForm.get('email')?.hasError('email')
+            "
+            class="text-red-500"
+          >
+            Ingresa un correo válido.
+          </small>
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700"
+            >Contraseña</label
+          >
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [attr.aria-invalid]="registerForm.get('password')?.invalid"
+            aria-describedby="passwordError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                registerForm.get('password')?.touched &&
+                registerForm.get('password')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
+          />
+          <small
+            *ngIf="
+              registerForm.get('password')?.touched &&
+              registerForm.get('password')?.hasError('required')
+            "
+            id="passwordError"
+            class="text-red-500"
+          >
+            La contraseña es obligatoria.
+          </small>
+          <small
+            *ngIf="
+              registerForm.get('password')?.touched &&
+              registerForm.get('password')?.hasError('minlength')
+            "
+            class="text-red-500"
+          >
+            Debe tener al menos 6 caracteres.
+          </small>
+        </div>
+
+        <!-- Confirmar Contraseña -->
+        <div>
+          <label
+            for="confirmPassword"
+            class="block text-sm font-medium text-gray-700"
+            >Confirma tu Contraseña</label
+          >
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            [attr.aria-invalid]="registerForm.get('confirmPassword')?.invalid"
+            aria-describedby="confirmPasswordError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                registerForm.get('confirmPassword')?.touched &&
+                registerForm.get('confirmPassword')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none"
+          />
+          <small
+            *ngIf="
+              registerForm.get('confirmPassword')?.touched &&
+              registerForm.get('confirmPassword')?.hasError('required')
+            "
+            id="confirmPasswordError"
+            class="text-red-500"
+          >
+            Confirmar contraseña es obligatorio.
+          </small>
+          <small
+            *ngIf="
+              registerForm.get('confirmPassword')?.touched &&
+              registerForm.get('confirmPassword')?.hasError('minlength')
+            "
+            class="text-red-500"
+          >
+            Debe tener al menos 6 caracteres.
+          </small>
+          <small
+            *ngIf="
+              registerForm.hasError('passwordMismatch') &&
+              registerForm.get('confirmPassword')?.touched
+            "
+            class="text-red-500"
+          >
+            Las contraseñas no coinciden.
+          </small>
+        </div>
+
+        <!-- Botón -->
+        <button
+          [disabled]="registerForm.invalid"
+          type="submit"
+          class="w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Empezar Ahora
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>
