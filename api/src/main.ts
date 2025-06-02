@@ -5,6 +5,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { webcrypto } from 'crypto';
+import { config } from 'dotenv';
+
+
+config({ path: '../.env' }); // Load environment variables from .env file
 
 if (!(globalThis as any).crypto) {
   (globalThis as any).crypto = webcrypto;
@@ -27,6 +31,8 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept, Authorization', 
     credentials: true,
   });
+
+  app.setGlobalPrefix('api');
   
   await app.listen(process.env.PORT ?? 3000);
 }
