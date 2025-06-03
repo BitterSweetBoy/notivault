@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards, UnauthorizedException, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response, Request } from 'express';
 import { Public } from './decorators/public.decorator';
@@ -7,10 +7,11 @@ import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 import { SESSION_TTL } from './constants';
 import { getRequestIP } from '../common/utils/request-ip.util';
+import { SessionService } from './session.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private auth: AuthService) {}
+  constructor(private auth: AuthService, private session: SessionService) {}
 
   @Post('register')
   @Public()
@@ -56,4 +57,11 @@ export class AuthController {
     res.clearCookie('SESSION_ID');
     
   }
+
+  @Get('validate')
+  @UseGuards(AuthGuard)
+  validateSession(@Req() req: any) {
+    return "Sesión válida";
+  }
+
 }

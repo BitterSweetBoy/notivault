@@ -1,19 +1,31 @@
 import { Routes } from '@angular/router';
-import { privateGuard, publicGuard } from './core/guards/auth.guard';
+import { privateGuard } from './core/guards/auth.guard';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
-    {
-        path: 'auth',
-        canActivate: [publicGuard],
-        loadChildren: () => import('./auth/auth.routes')
-    },
-    {
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.routes'),
+  },
+  {
+    path: '',
+    component: LayoutComponent,
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard',
+      },
+      {
         path: 'dashboard',
-        canActivate:  [privateGuard],
-        loadComponent: () => import('./components/dahsboard/dahsboard.component'),
-    },
-    {
-        path: '**',
-        redirectTo: 'dashboard'
-    }
+        canActivate: [privateGuard],
+        loadComponent: () =>
+          import('./components/dahsboard/dahsboard.component'),
+      },
+    ],
+  },
+  {
+    path: '**',
+    redirectTo: 'dashboard',
+  },
 ];
