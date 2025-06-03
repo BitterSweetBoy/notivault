@@ -20,4 +20,3 @@ export const privateGuard: CanActivateFn = (): Observable<boolean | UrlTree> => 
     })
   );
 };
-
