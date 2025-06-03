@@ -1,0 +1,121 @@
+<div class="min-h-screen flex">
+  <!-- Left Panel (oculto en pantallas pequeñas) -->
+  <div
+    class="hidden lg:flex w-1/2 bg-gradient-to-br from-purple-600 to-pink-500 items-center justify-center p-10"
+  >
+    <div class="text-white space-y-6 max-w-md">
+      <h1 class="text-4xl font-extrabold">¡Bienvenido de nuevo!</h1>
+      <p class="text-lg opacity-90">
+        Ingresa para continuar gestionando tus
+        <span class="font-semibold">Notificaciones</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Right Panel: Formulario de Login -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+    <div class="bg-white shadow-2xl rounded-2xl w-full max-w-md p-10">
+      <div class="mb-6 text-center">
+        <h2 class="text-2xl font-bold text-gray-800">Iniciar Sesión</h2>
+        <p class="text-sm text-gray-500 mt-2">
+          Ingresa tu correo y contraseña para continuar.
+        </p>
+      </div>
+
+      <!-- Formulario Angular Reactive Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5">
+        <!-- Correo Electrónico -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="loginForm.get('email')?.invalid"
+            aria-describedby="emailError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                loginForm.get('email')?.touched &&
+                loginForm.get('email')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-indigo-300 placeholder-gray-500"
+            placeholder="usuario@ejemplo.com"
+          />
+          <small
+            *ngIf="
+              loginForm.get('email')?.touched &&
+              loginForm.get('email')?.hasError('required')
+            "
+            id="emailError"
+            class="text-red-500"
+          >
+            El correo es obligatorio.
+          </small>
+          <small
+            *ngIf="
+              loginForm.get('email')?.touched &&
+              loginForm.get('email')?.hasError('email')
+            "
+            class="text-red-500"
+          >
+            Ingresa un correo válido.
+          </small>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="relative">
+          <label for="password" class="block text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            [attr.aria-invalid]="loginForm.get('password')?.invalid"
+            aria-describedby="passwordError"
+            [ngClass]="{
+              'border-red-500 ring-red-300':
+                loginForm.get('password')?.touched &&
+                loginForm.get('password')?.invalid
+            }"
+            class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-indigo-300 pr-10 placeholder-gray-500"
+            placeholder="••••••••"
+          />
+
+          <small
+            *ngIf="
+              loginForm.get('password')?.touched &&
+              loginForm.get('password')?.hasError('required')
+            "
+            id="passwordError"
+            class="text-red-500"
+          >
+            La contraseña es obligatoria.
+          </small>
+        </div>
+
+        <!-- Enlace: ¿Olvidaste tu contraseña? -->
+        <div class="flex justify-end">
+          <a routerLink="/forgot-password" class="text-sm text-indigo-600 hover:underline">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+
+        <!-- Botón de Ingresar -->
+        <button
+          [disabled]="loginForm.invalid"
+          type="submit"
+          class="w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>
