@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { register } from '../interfaces/registerDTO';
-import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, delay, firstValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthState } from '../interfaces/authStateInterface';
 import { login } from '../interfaces/loginDTO';
@@ -51,17 +51,24 @@ export class AuthService {
 
   verifySession(): Observable<boolean> {
     return this.http.get<string>(`${this.apiUrl}/auth/validate`).pipe(
-      tap((res: string) => {
-        this.authState.set({ loggedIn: true });
+      tap(() => {
+        this.authState.set({ loggedIn: true, user: null });
       }),
-      map(() => {
-        return true;
-      }),
+      map(() => true),
       catchError((err) => {
-        console.log('ERROR AL VALIDAR LA SESSION');
-        this.authState.set({ loggedIn: false });
+        this.authState.set({ loggedIn: false, user: null });
         return throwError(() => err);
       })
     );
   }
+
+  verifySessionOnce(): Promise<void> {
+    return firstValueFrom(
+      this.verifySession().pipe(
+        // Si da error, regresamos `of(false)` para que no detenga la promesa
+        catchError(() => of(false))
+      )
+    ).then(() => void 0);
+  }
+
 }
