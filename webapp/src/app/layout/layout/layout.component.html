@@ -1,0 +1,104 @@
+<div class="flex h-screen bg-gray-100">
+  <!-- ================================1) SIDEBAR================================= -->
+  <aside class="flex flex-col w-64 bg-white text-gray-100">
+    <!-- Logo / Branding -->
+    <div class="h-16 flex items-center px-8 py-6 space-x-2">
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 64 64"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect width="64" height="64" rx="16" fill="#432dd7" />
+        <path
+          d="M20 26C20 20.4772 24.4772 16 30 16H34C39.5228 16 44 20.4772 44 26V30C44 31.0609 44.4214 32.0783 45.1716 32.8284L46 33.6569C46.7071 34.364 47 35.3137 47 36.2929V40C47 42.2091 45.2091 44 43 44H21C18.7909 44 17 42.2091 17 40V36.2929C17 35.3137 17.2929 34.364 18 33.6569L18.8284 32.8284C19.5786 32.0783 20 31.0609 20 30V26Z"
+          fill="white"
+        />
+        <circle cx="32" cy="48" r="4" fill="#ea37a7" />
+      </svg>
+      <span class="text-black text-2xl font-bold">Notivault</span>
+    </div>
+
+    <nav class="flex-1 px-4 py-6 overflow-y-auto">
+      <!-- Sección Principal -->
+      <ul class="space-y-1">
+        <li *ngFor="let item of mainNav">
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="bg-[#eef2ff] text-indigo-700"
+            class="flex items-center px-3 py-2 rounded-lg transition-colors duration-200 text-gray-700 hover:bg-gray-100"
+          >
+            <ng-icon
+              [name]="item.icon"
+              class="w-5 h-5 flex-shrink-0 mr-3"
+            ></ng-icon>
+            <span
+              class="text-sm font-medium text-gray-700"
+              routerLinkActive="text-indigo-700"
+            >
+              {{ item.label }}
+            </span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Opcional: Footer del sidebar -->
+    <div class="px-4 py-4">
+      <button
+        class="w-full flex items-center justify-center px-4 py-2 bg-indigo-700 rounded-lg hover:bg-indigo-800 transition-colors duration-200 text-sm"
+      >
+        + Notificación
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================================ 2) CONTENIDO PRINCIPAL ================================= -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- NAVBAR SUPERIOR -->
+    <header class="flex items-center justify-between h-16 px-6 bg-white">
+      <div class="flex items-center space-x-2"></div>
+
+      <!-- Iconos / Perfil Usuario -->
+      <div class="flex items-center space-x-4">
+        <!-- Notificaciones -->
+        <button
+          class="relative p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
+        >
+          <!-- <ng-icon icon="heroBell" class="w-6 h-6 text-gray-500"></ng-icon> -->
+        </button>
+
+        <!-- Avatar + nombre -->
+        <!-- Avatar + nombre -->
+        <div class="flex items-center space-x-2 cursor-pointer group">
+          <ng-container *ngIf="userImage; else initials">
+            <img
+              [src]="userImage"
+              alt="Avatar"
+              class="w-8 h-8 rounded-full object-cover"
+            />
+          </ng-container>
+          <ng-template #initials>
+            <div
+              class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center text-sm font-semibold"
+            >
+              {{ userName[0] | uppercase }}
+            </div>
+          </ng-template>
+
+          <span
+            class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors duration-200"
+          >
+            {{ userName }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ÁREA DE CONTENIDO -->
+    <main class="flex-1 overflow-y-auto p-6 bg-gray-100">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
