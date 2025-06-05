@@ -14,7 +14,7 @@ export const CookieInterceptor: HttpInterceptorFn = (req, next) => {
   return next(modifiedReq).pipe(
     catchError((error) => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
-        authService.logout();
+        authService.authState.set({ loggedIn: false });
         router.navigateByUrl('/auth/login');
       }
       return throwError(() => error);
