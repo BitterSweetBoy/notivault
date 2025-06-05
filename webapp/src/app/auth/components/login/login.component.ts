@@ -12,10 +12,11 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from '../../services/auth.service';
 import { login } from '../../interfaces/loginDTO';
 import { finalize } from 'rxjs';
+import { LoadingSpinnerComponent } from "../../../shared/loading-spinner/loading-spinner.component";
 
 @Component({
   selector: 'app-login',
-  imports: [ToastModule, CommonModule, ReactiveFormsModule],
+  imports: [ToastModule, CommonModule, ReactiveFormsModule, LoadingSpinnerComponent],
   providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -42,12 +43,12 @@ export default class LoginComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
+    this.isLoading = true;
     const { email, password } = this.loginForm.value;
     this.userData = { email, password };
     console.log(this.userData);
     this.authService
       .login(this.userData)
-      .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (res) => {
           this.messageService.add({
@@ -56,6 +57,7 @@ export default class LoginComponent {
             detail: 'Bienvenido de nuevo',
           });
           this.router.navigate(['/']);
+          this.isLoading = false
         },
         error: (err) => {
           this.messageService.add({
@@ -63,6 +65,7 @@ export default class LoginComponent {
             summary: 'Error en el login',
             detail: err.error.message || 'Credenciales incorrectas',
           });
+          this.isLoading = false
         },
       });
   }
