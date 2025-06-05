@@ -6,6 +6,7 @@ import { LayoutComponent } from './layout/layout.component';
 export const routes: Routes = [
   {
     path: 'auth',
+    canActivate: [publicGuard],
     loadChildren: () => import('./auth/auth.routes'),
   },
   {
