@@ -4,10 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { MattermostTokenConfigComponent } from "./mattermost-token-config/mattermost-token-config.component";
+import { PlaneTokenConfigComponent } from "./plane-token-config/plane-token-config.component";
 
 @Component({
   selector: 'app-api-token-details',
-  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule],
+  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, MattermostTokenConfigComponent, PlaneTokenConfigComponent],
   templateUrl: './api-token-details.component.html',
   styleUrl: './api-token-details.component.scss',
   encapsulation: ViewEncapsulation.None,  // para que el estilo se aplique al host
