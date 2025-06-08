@@ -1,0 +1,27 @@
+<tr>
+      <td colspan="4" class="p-0">
+        <div class="p-4 bg-gray-50">
+          <!-- Contenido para Plane.so -->
+          <div *ngIf="token.servicio === 'Plane.so'" class="space-y-4">
+            <app-plane-token-config
+              [token]="token"
+              [isEditing]="isEditing"
+              (copy)="onCopy($event)"
+              (save)="onSave()"
+              (cancel)="onCancel()"
+            ></app-plane-token-config>
+          </div>
+
+          <!-- Contenido para Mattermost -->
+          <div *ngIf="token.servicio === 'Mattermost'" class="space-y-4">
+            <app-mattermost-token-config
+              [token]="token"
+              [isEditing]="isEditing"
+              (copy)="onCopy($event)"
+              (save)="onSave()"
+              (cancel)="onCancel()"
+            ></app-mattermost-token-config>
+          </div>
+        </div>
+      </td>
+    </tr>
