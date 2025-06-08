@@ -52,7 +52,7 @@
 
   <!-- Columna: Última modificación -->
   <td class="p-4 text-sm text-gray-900 whitespace-nowrap">
-    {{ formatDate(token.ultimaModificacion) }}
+    {{ token.ultimaModificacion | formatDate }}
   </td>
 
   <!-- Columna: Acciones -->

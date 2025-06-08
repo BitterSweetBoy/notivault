@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ApiToken } from '../../../shared/models/api-token.interface';
+import { FormatDatePipe } from "../../../shared/pipes/format-date.pipe";
 
 @Component({
   selector: 'app-api-token-row',
-  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule],
+  imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, FormatDatePipe],
   templateUrl: './api-token-row.component.html',
   styleUrl: './api-token-row.component.scss',
   encapsulation: ViewEncapsulation.None,  // para que el estilo se aplique al host
@@ -34,16 +35,6 @@ export class ApiTokenRowComponent {
 
   onToggleExpand(): void {
     this.toggleExpand.emit(this.token);
-  }
-
-  formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
   }
 
 }

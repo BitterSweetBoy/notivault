@@ -74,13 +74,4 @@ export default class ApiConfigComponent implements OnInit {
     console.log('Eliminar:', token);
   }
 
-  formatDate(date: Date): string {
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  }
 }
