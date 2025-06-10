@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("DATABASE_URL")
 }
 
 model User {
@@ -46,4 +46,31 @@ model LoginAttempt {
   userAgent  String?
   timestamp  DateTime @default(now())
   success    Boolean
+}
+
+model IntegrationService {
+  id          String     @id @default(uuid())
+  nombre      String     @unique
+  descripcion String?
+  icono       String?
+  tokens      ApiToken[]
+}
+
+model ApiToken {
+  id                 String              @id @default(uuid())
+  integrationServiceId String
+  integrationService IntegrationService @relation(fields: [integrationServiceId], references: [id])
+  descripcion        String
+  estado             TokenEstado  
+  ultimaModificacion DateTime
+  fechaConfiguracion DateTime
+  ultimaVerificacion DateTime
+  apiKey             String
+  serverUrl          String?
+  activo                 Boolean             @default(true)
+}
+
+enum TokenEstado {
+  conectado
+  desconectado
 }
