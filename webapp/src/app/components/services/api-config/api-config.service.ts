@@ -1,38 +1,61 @@
-import { Injectable, signal } from '@angular/core';
-import { ApiToken } from '../../../shared/models/api-token.interface';
+import { inject, Injectable, signal } from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, Observable, tap, throwError } from 'rxjs';
+import {
+  ApiToken,
+  CreateApiTokenDto,
+  UpdateApiTokenDto,
+} from '../../../shared/models/api-token.model';
+import { ApiResponse } from '../../../shared/models/api-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiConfigService {
-  constructor() {}
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.API_URL}/api-tokens`;
 
-  tokens: ApiToken[] = [
-    {
-      id: 1,
-      servicio: 'Plane.so',
-      descripcion: 'API Key configurada',
-      estado: 'conectado',
-      ultimaModificacion: new Date('2025-06-06T14:30:00'),
-      fechaConfiguracion: new Date('2025-06-06T14:30:00'),
-      ultimaVerificacion: new Date('2025-06-06T15:45:00'),
-      apiKey: 'pLsk_a1b2c3d4e5f6g7h8i9j0',
-    },
-    {
-      id: 2,
-      servicio: 'Mattermost',
-      descripcion: 'API Key y URL configuradas',
-      estado: 'conectado',
-      ultimaModificacion: new Date('2025-06-05T09:15:00'),
-      fechaConfiguracion: new Date('2025-06-05T09:15:00'),
-      ultimaVerificacion: new Date('2025-06-05T10:30:00'),
-      apiKey: 'mm_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6',
-      serverUrl: 'https://mattermost.tudominio.com',
-    },
-  ];
+  readonly tokens = signal<ApiToken[]>([]);
 
-  getApiTokens() {
-    return this.tokens;
+  /** Carga todos los tokens y actualiza la señal */
+  getApiTokens(): Observable<ApiToken[]> {
+    return this.http
+      .get<ApiToken[]>(this.baseUrl) 
+      .pipe(
+        tap((data) => {
+          console.log(data); 
+          this.tokens.set(data);
+        })
+      );
   }
 
+  /** Crea un token y lo añade a la señal */
+  createApiToken(dto: CreateApiTokenDto): Observable<ApiToken> {
+    return this.http.post<ApiResponse<ApiToken>>(this.baseUrl, dto).pipe(
+      map((res) => res.data),
+      tap((newToken) => this.tokens.update((current) => [newToken, ...current]))
+    );
+  }
+
+  updateApiToken( id: string, dto: UpdateApiTokenDto): Observable<ApiToken> {
+    return this.http.patch<ApiToken>(`${this.baseUrl}/${id}`, dto).pipe(
+      tap(updated =>
+        this.tokens.update(list =>
+          list.map(t => (t.id === updated.id ? updated : t))
+        )
+      )
+    );
+  }
+
+  /** Desactiva (soft‑delete) un token y lo elimina de la señal */
+  deleteApiToken(id: string): Observable<null> {
+  return this.http
+    .delete<null>(`${this.baseUrl}/${id}`)
+    .pipe(
+      tap(() =>
+        this.tokens.update(list => list.filter(t => t.id !== id))
+      )
+    );
+}
 }

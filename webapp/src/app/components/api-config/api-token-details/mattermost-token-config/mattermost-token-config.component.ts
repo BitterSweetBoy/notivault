@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { ApiToken } from '../../../../shared/models/api-token.interface';
+import { ApiToken } from '../../../../shared/models/api-token.model';
 import { FormatDatePipe } from "../../../../shared/pipes/format-date.pipe";
 
 @Component({

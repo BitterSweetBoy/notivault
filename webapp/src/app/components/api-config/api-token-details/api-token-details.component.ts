@@ -1,12 +1,11 @@
 import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { ApiToken } from '../../../shared/models/api-token.interface';
+import { ApiToken } from '../../../shared/models/api-token.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { MattermostTokenConfigComponent } from "./mattermost-token-config/mattermost-token-config.component";
 import { PlaneTokenConfigComponent } from "./plane-token-config/plane-token-config.component";
-
 @Component({
   selector: 'app-api-token-details',
   imports: [CommonModule, FormsModule, ButtonModule, TooltipModule, MattermostTokenConfigComponent, PlaneTokenConfigComponent],
