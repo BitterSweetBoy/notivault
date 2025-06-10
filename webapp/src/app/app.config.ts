@@ -8,6 +8,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CookieInterceptor } from './core/interceptors/cookie.interceptor';
 import { initializeSession } from './app.init'; 
+import { ApiResponseInterceptor } from './core/interceptors/api-response.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +23,12 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    provideHttpClient(withInterceptors([CookieInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        CookieInterceptor,
+        ApiResponseInterceptor
+      ])
+    ),
     provideAppInitializer(initializeSession)
   ],
 };
