@@ -19,54 +19,70 @@
         Agregar token
       </button>
     </div>
-    <p-table
-      [value]="tokens"
-      dataKey="id"
-      [resizableColumns]="false"
-      [rows]="10"
-      [expandedRowKeys]="expandedRows"
-      styleClass="p-datatable-sm"
-    >
-      <!-- Cabecera de columnas -->
-      <ng-template #header>
-        <tr>
-          <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Servicio
-          </th>
-          <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Estado
-          </th>
-          <th class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Última modificación
-          </th>
-          <th class="p-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Acciones
-          </th>
-        </tr>
-      </ng-template>
+    <div class="relative overflow-hidden">
+      <div
+        *ngIf="isLoading"
+        class="absolute inset-0 bg-white/60 bg-opacity-20 flex items-center justify-center z-10"
+      >
+        <p-progressSpinner></p-progressSpinner>
+      </div>
+      <p-table
+        [value]="tokens"
+        dataKey="id"
+        [resizableColumns]="false"
+        [rows]="10"
+        [expandedRowKeys]="expandedRows"
+        styleClass="p-datatable-sm"
+      >
+        <!-- Cabecera de columnas -->
+        <ng-template #header>
+          <tr>
+            <th
+              class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Servicio
+            </th>
+            <th
+              class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Estado
+            </th>
+            <th
+              class="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Última modificación
+            </th>
+            <th
+              class="p-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Acciones
+            </th>
+          </tr>
+        </ng-template>
 
-      <!-- Cuerpo de filas -->
-      <ng-template #body let-token let-expanded="expanded">
-        <app-api-token-row
-          [token]="token"
-          [expanded]="expanded"
-          (edit)="onEdit($event)"
-          (delete)="onDelete($event)"
-          (toggleExpand)="expandedRows[token.id] = !expandedRows[token.id]"
-        ></app-api-token-row>
-      </ng-template>
+        <!-- Cuerpo de filas -->
+        <ng-template #body let-token let-expanded="expanded">
+          <app-api-token-row
+            [token]="token"
+            [expanded]="expanded"
+            (edit)="onEdit($event)"
+            (delete)="onDelete($event)"
+            (toggleExpand)="expandedRows[token.id] = !expandedRows[token.id]"
+          ></app-api-token-row>
+        </ng-template>
 
-      <!-- Template para el contenido expandido -->
-      <ng-template #expandedrow let-token>
-        <app-api-token-details
-          [token]="token"
-          [isEditing]="isEditing[token.id]"
-          (copy)="copyToClipboard($event)"
-          (save)="saveToken(token)"
-          (cancel)="cancelEdit(token)"
-        ></app-api-token-details>
-      </ng-template>
-    </p-table>
+        <!-- Template para el contenido expandido -->
+        <ng-template #expandedrow let-token>
+          <app-api-token-details
+            [token]="token"
+            [isEditing]="isEditing[token.id]"
+            (copy)="copyToClipboard($event)"
+            (save)="saveToken(token)"
+            (cancel)="cancelEdit(token)"
+          ></app-api-token-details>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
 </div>
 

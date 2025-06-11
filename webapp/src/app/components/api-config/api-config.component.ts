@@ -16,10 +16,11 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { AddApiTokenComponent } from './add-api-token/add-api-token.component';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-api-config',
-  imports: [ CommonModule, FormsModule, DropdownModule, TableModule, TooltipModule, ButtonModule, MessageModule, ToastModule, TabsModule, TagModule, ApiTokenRowComponent, ApiTokenDetailsComponent, ModalComponent, AddApiTokenComponent,],
+  imports: [ CommonModule, FormsModule, DropdownModule, TableModule, TooltipModule, ButtonModule, MessageModule, ToastModule, TabsModule, TagModule, ApiTokenRowComponent, ApiTokenDetailsComponent, ModalComponent, AddApiTokenComponent, ProgressSpinnerModule],
   providers: [MessageService],
   templateUrl: './api-config.component.html',
   styleUrl: './api-config.component.scss',
@@ -34,6 +35,7 @@ export default class ApiConfigComponent implements OnInit {
   expandedRows: ExpandedRowsState = {};
   isEditing: EditingState = {};
   originalValues: OriginalValues = {};
+  isLoading: boolean = true;
 
   constructor(){
     effect(() => {
@@ -62,8 +64,12 @@ export default class ApiConfigComponent implements OnInit {
 
   private loadTokens(): void {
     this.apiConfigService.getApiTokens().subscribe({
-      next: (tokens) => (this.tokens = tokens),
+      next: (tokens) => {
+        this.tokens = tokens
+        this.isLoading = false;
+      },
       error: (err) => {
+        this.isLoading = false;
         this.messageService.add({
           severity: 'error',
           summary: 'Error al cargar los datos',
@@ -87,6 +93,7 @@ export default class ApiConfigComponent implements OnInit {
       serverUrl: token.serverUrl,
     };
 
+    this.isLoading = true;
     this.apiConfigService.updateApiToken(token.id, dto).subscribe({
       next: (updated) => {
         this.tokens = this.tokens.map((t) =>
@@ -99,6 +106,7 @@ export default class ApiConfigComponent implements OnInit {
           summary: 'Token actualizado',
           detail: 'El token se ha actualizado correctamente',
         });
+        this.isLoading = false;
       },
       error: (err) => {
         this.messageService.add({
@@ -106,6 +114,7 @@ export default class ApiConfigComponent implements OnInit {
           summary: 'Error al guardar',
           detail: 'No se pudo actualizar el token',
         });
+        this.isLoading = false;
         this.cancelEdit(token);
       },
     });
@@ -129,6 +138,7 @@ export default class ApiConfigComponent implements OnInit {
     ) {
       return;
     }
+    this.isLoading = true;
     this.apiConfigService.deleteApiToken(token.id).subscribe({
       next: () => {
         this.tokens = this.tokens.filter((t) => t.id !== token.id);
@@ -137,6 +147,7 @@ export default class ApiConfigComponent implements OnInit {
           summary: 'Token eliminado',
           detail: 'El token se ha eliminado correctamente',
         });
+        this.isLoading = false;
       },
       error: (err) => {
         this.messageService.add({
@@ -144,6 +155,7 @@ export default class ApiConfigComponent implements OnInit {
           summary: 'Error al eliminar',
           detail: 'No se pudo desactivar el token',
         });
+        this.isLoading = false;
       },
     });
   }
