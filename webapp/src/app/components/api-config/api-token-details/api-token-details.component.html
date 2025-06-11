@@ -1,26 +1,43 @@
 <tr>
   <td colspan="4" class="p-0">
-    <div class="p-4 bg-gray-50">
-      <!-- Contenido para Plane.so -->
-      <div *ngIf="token.servicio === 'Plane.so'" class="space-y-4">
+    <div class="p-4 bg-gray-50 space-y-4">
+      <!-- Componente dinámico según el tipo -->
+      <ng-container *ngIf="token.servicio === 'Plane.so'">
         <app-plane-token-config
           [token]="token"
           [isEditing]="isEditing"
           (copy)="onCopy($event)"
-          (save)="onSave()"
-          (cancel)="onCancel()"
         ></app-plane-token-config>
-      </div>
+      </ng-container>
 
-      <!-- Contenido para Mattermost -->
-      <div *ngIf="token.servicio === 'Mattermost'" class="space-y-4">
+      <ng-container *ngIf="token.servicio === 'Mattermost'">
         <app-mattermost-token-config
           [token]="token"
           [isEditing]="isEditing"
           (copy)="onCopy($event)"
-          (save)="onSave()"
-          (cancel)="onCancel()"
         ></app-mattermost-token-config>
+      </ng-container>
+
+      <!-- Botones globales -->
+      <div class="flex justify-end space-x-2" *ngIf="isEditing">
+        <button
+          pButton
+          type="submit"
+          label="Guardar"
+          severity="info"
+          icon="pi pi-check"
+          class="p-button-sm "
+          (click)="onSave()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          severity="danger"
+          icon="pi pi-times"
+          class="p-button-sm"
+          (click)="onCancel()"
+        ></button>
       </div>
     </div>
   </td>

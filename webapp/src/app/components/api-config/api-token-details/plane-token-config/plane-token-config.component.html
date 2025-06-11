@@ -41,24 +41,5 @@
         >Última verificación: {{ token.ultimaVerificacion | formatDate }}</span
       >
     </div>
-
-    <div class="flex space-x-2" *ngIf="isEditing">
-      <button
-        pButton
-        type="button"
-        label="Guardar"
-        icon="pi pi-check"
-        class="p-button-sm p-button-success"
-        (click)="onSave()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        label="Cancelar"
-        icon="pi pi-times"
-        class="p-button-sm p-button-secondary"
-        (click)="onCancel()"
-      ></button>
-    </div>
   </div>
 </div>
