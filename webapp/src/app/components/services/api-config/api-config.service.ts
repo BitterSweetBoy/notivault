@@ -32,8 +32,8 @@ export class ApiConfigService {
 
   /** Crea un token y lo añade a la señal */
   createApiToken(dto: CreateApiTokenDto): Observable<ApiToken> {
-    return this.http.post<ApiResponse<ApiToken>>(this.baseUrl, dto).pipe(
-      map((res) => res.data),
+    return this.http.post<ApiToken>(this.baseUrl, dto).pipe(
+      map((res) => res),
       tap((newToken) => this.tokens.update((current) => [newToken, ...current]))
     );
   }

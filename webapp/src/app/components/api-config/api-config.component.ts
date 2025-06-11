@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { ApiConfigService } from '../services/api-config/api-config.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,28 +9,17 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
-import { ApiToken, EditingState, ExpandedRowsState, OriginalValues, UpdateApiTokenDto,} from '../../shared/models/api-token.model';
+import { ApiToken, EditingState, ExpandedRowsState, OriginalValues, UpdateApiTokenDto, } from '../../shared/models/api-token.model';
 import { ApiTokenRowComponent } from './api-token-row/api-token-row.component';
 import { ApiTokenDetailsComponent } from './api-token-details/api-token-details.component';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ModalComponent } from '../../shared/modal/modal.component';
+import { AddApiTokenComponent } from './add-api-token/add-api-token.component';
 
 @Component({
   selector: 'app-api-config',
-  imports: [
-    CommonModule,
-    FormsModule,
-    DropdownModule,
-    TableModule,
-    TooltipModule,
-    ButtonModule,
-    MessageModule,
-    ToastModule,
-    TabsModule,
-    TagModule,
-    ApiTokenRowComponent,
-    ApiTokenDetailsComponent,
-  ],
+  imports: [ CommonModule, FormsModule, DropdownModule, TableModule, TooltipModule, ButtonModule, MessageModule, ToastModule, TabsModule, TagModule, ApiTokenRowComponent, ApiTokenDetailsComponent, ModalComponent, AddApiTokenComponent,],
   providers: [MessageService],
   templateUrl: './api-config.component.html',
   styleUrl: './api-config.component.scss',
@@ -38,6 +27,7 @@ import { ToastModule } from 'primeng/toast';
 export default class ApiConfigComponent implements OnInit {
   private apiConfigService = inject(ApiConfigService);
   private messageService = inject(MessageService);
+  showAddModal = false;
 
   // ESTADO LOCAL
   tokens: ApiToken[] = [];
@@ -45,26 +35,42 @@ export default class ApiConfigComponent implements OnInit {
   isEditing: EditingState = {};
   originalValues: OriginalValues = {};
 
+  constructor(){
+    effect(() => {
+      this.tokens = this.apiConfigService.tokens();
+    });
+  }
+
   ngOnInit(): void {
     this.loadTokens();
   }
 
+  openAddModal() {
+    this.showAddModal = true;
+  }
+
+  onTokenCreated(token: ApiToken | null) {
+    if (token) {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Token creado',
+        detail: 'El token se ha creado crrectamente',
+      });
+    }
+    this.showAddModal = false;
+  }
+
   private loadTokens(): void {
     this.apiConfigService.getApiTokens().subscribe({
-      next: tokens => (this.tokens = tokens),
-      error: err => console.error('Error cargando tokens:', err),
+      next: (tokens) => (this.tokens = tokens),
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al cargar los datos',
+          detail: 'No se lograron obtener los api key guardados'
+        })
+      } 
     });
-  }
-
-  onRowExpand(event: any): void {
-    console.log('Fila expandida:', event.data);
-  }
-
-  onRowCollapse(event: any): void {
-    console.log('Fila colapsada:', event.data);
-    if (this.isEditing[event.data.id]) {
-      this.cancelEdit(event.data);
-    }
   }
 
   onEdit(token: ApiToken): void {
@@ -82,8 +88,10 @@ export default class ApiConfigComponent implements OnInit {
     };
 
     this.apiConfigService.updateApiToken(token.id, dto).subscribe({
-      next: updated => {
-        this.tokens = this.tokens.map(t => (t.id === updated.id ? updated : t));
+      next: (updated) => {
+        this.tokens = this.tokens.map((t) =>
+          t.id === updated.id ? updated : t
+        );
         this.isEditing[token.id] = false;
         delete this.originalValues[token.id];
         this.messageService.add({
@@ -92,16 +100,15 @@ export default class ApiConfigComponent implements OnInit {
           detail: 'El token se ha actualizado correctamente',
         });
       },
-      error: err => {
+      error: (err) => {
         this.messageService.add({
-            severity: 'error',
-            summary: 'Error al guardar',
-            detail: 'No se pudo actualizar el token',
-          });
+          severity: 'error',
+          summary: 'Error al guardar',
+          detail: 'No se pudo actualizar el token',
+        });
         this.cancelEdit(token);
       },
     });
-
   }
 
   cancelEdit(token: ApiToken): void {
@@ -111,30 +118,32 @@ export default class ApiConfigComponent implements OnInit {
   }
 
   copyToClipboard(text: string): void {
-    navigator.clipboard.writeText(text).then(() => {
-      console.log('Copiado al portapapeles');
-    });
+    navigator.clipboard.writeText(text)
   }
 
   onDelete(token: ApiToken): void {
-    if (!confirm(`¿Seguro que quieres desactivar el token "${token.descripcion}"?`)) {
+    if (
+      !confirm(
+        `¿Seguro que quieres desactivar el token "${token.descripcion}"?`
+      )
+    ) {
       return;
     }
     this.apiConfigService.deleteApiToken(token.id).subscribe({
       next: () => {
-        this.tokens = this.tokens.filter(t => t.id !== token.id);
+        this.tokens = this.tokens.filter((t) => t.id !== token.id);
         this.messageService.add({
           severity: 'success',
           summary: 'Token eliminado',
           detail: 'El token se ha eliminado correctamente',
         });
       },
-      error: err => {
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error al eliminar',
           detail: 'No se pudo desactivar el token',
-        })
+        });
       },
     });
   }
