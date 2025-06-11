@@ -1,0 +1,11 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '500px' }"
+  [header]="header"
+  [breakpoints]="{ '640px': '90vw', '960px': '75vw' }"
+>
+  <ng-content></ng-content>
+</p-dialog>
