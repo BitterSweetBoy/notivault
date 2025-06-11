@@ -1,0 +1,70 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div class="space-y-4">
+
+    <!-- Selección de servicio -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Servicio</label>
+      <p-select
+        [options]="servicios"
+        formControlName="integrationServiceId"
+        optionLabel="nombre"
+        optionValue="id"
+        placeholder="Selecciona un servicio"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- API Key / Webhook URL -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700">
+        {{ getSelectedServiceName() === 'Plane.so' ? 'API Key' : 'Webhook URL' }}
+      </label>
+      <input
+        pInputText
+        type="text"
+        formControlName="apiKey"
+        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300"
+      />
+    </div>
+
+    <!-- Server URL sólo para Mattermost -->
+    <div *ngIf="getSelectedServiceName() === 'Mattermost'">
+      <label class="block text-sm font-medium text-gray-700">Server URL</label>
+      <input
+        pInputText
+        type="text"
+        formControlName="serverUrl"
+        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300"
+      />
+    </div>
+
+    <!-- Descripción -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Descripción</label>
+      <input
+        pInputText
+        type="text"
+        formControlName="descripcion"
+        class="w-full mt-2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300"
+      />
+    </div>
+
+    <!-- Botones -->
+    <div class="flex justify-end space-x-2 pt-4">
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        label="Cancelar"
+        class="p-button-text"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Guardar"
+        severity="info"
+        class="p-button-text"
+      ></button>
+    </div>
+  </div>
+</form>
