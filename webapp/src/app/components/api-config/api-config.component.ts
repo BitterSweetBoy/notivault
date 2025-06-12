@@ -9,7 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
-import { ApiToken, EditingState, ExpandedRowsState, OriginalValues, UpdateApiTokenDto, } from '../../shared/models/api-token.model';
+import { ApiToken, CreateApiTokenDto, EditingState, ExpandedRowsState, OriginalValues, UpdateApiTokenDto, } from '../../shared/models/api-token.model';
 import { ApiTokenRowComponent } from './api-token-row/api-token-row.component';
 import { ApiTokenDetailsComponent } from './api-token-details/api-token-details.component';
 import { MessageService } from 'primeng/api';
@@ -17,10 +17,11 @@ import { ToastModule } from 'primeng/toast';
 import { ModalComponent } from '../../shared/modal/modal.component';
 import { AddApiTokenComponent } from './add-api-token/add-api-token.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-api-config',
-  imports: [ CommonModule, FormsModule, DropdownModule, TableModule, TooltipModule, ButtonModule, MessageModule, ToastModule, TabsModule, TagModule, ApiTokenRowComponent, ApiTokenDetailsComponent, ModalComponent, AddApiTokenComponent, ProgressSpinnerModule],
+  imports: [ CommonModule, FormsModule, DropdownModule, TableModule, TooltipModule, ButtonModule, MessageModule, ToastModule, TabsModule, TagModule, ApiTokenRowComponent, ApiTokenDetailsComponent, ModalComponent, AddApiTokenComponent, ProgressSpinnerModule, SkeletonModule],
   providers: [MessageService],
   templateUrl: './api-config.component.html',
   styleUrl: './api-config.component.scss',
@@ -35,7 +36,8 @@ export default class ApiConfigComponent implements OnInit {
   expandedRows: ExpandedRowsState = {};
   isEditing: EditingState = {};
   originalValues: OriginalValues = {};
-  isLoading: boolean = true;
+  isLoading: boolean = false;
+  isInit: boolean = true;
 
   constructor(){
     effect(() => {
@@ -51,25 +53,42 @@ export default class ApiConfigComponent implements OnInit {
     this.showAddModal = true;
   }
 
-  onTokenCreated(token: ApiToken | null) {
-    if (token) {
-      this.messageService.add({
+  closeAddModal(){
+    this.showAddModal = false;
+  }
+
+  onTokenCreated(token: CreateApiTokenDto) {
+    this.showAddModal = false;
+    this.isLoading = true;
+    this.apiConfigService.createApiToken(token).subscribe({
+      next: (data) =>{
+        this.isLoading = false;
+        this.messageService.add({
         severity: 'success',
         summary: 'Token creado',
         detail: 'El token se ha creado crrectamente',
       });
-    }
-    this.showAddModal = false;
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo crear el token',
+        });
+        this.isLoading = false;
+      },
+    })
   }
 
   private loadTokens(): void {
+    this.isInit = true;
     this.apiConfigService.getApiTokens().subscribe({
       next: (tokens) => {
         this.tokens = tokens
-        this.isLoading = false;
+        this.isInit = false;
       },
       error: (err) => {
-        this.isLoading = false;
+        this.isInit = false;
         this.messageService.add({
           severity: 'error',
           summary: 'Error al cargar los datos',
