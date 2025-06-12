@@ -1,7 +1,6 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApiToken, CreateApiTokenDto } from '../../../shared/models/api-token.model';
-import { ApiConfigService } from '../../services/api-config/api-config.service';
+import { CreateApiTokenDto } from '../../../shared/models/api-token.model';
 import { CommonModule} from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IntegrationServices } from '../../../shared/models/integration-services.model';
@@ -17,11 +16,12 @@ import { ButtonModule } from 'primeng/button';
 })
 export class AddApiTokenComponent {
 
-  @Output() created = new EventEmitter<ApiToken>();
+  @Output() created = new EventEmitter<CreateApiTokenDto>();
+  @Output() cancel = new EventEmitter<void>();
   form!: FormGroup;
+  submitted = false;
 
   servicios: IntegrationServices[] = [];
-  apiConfig = inject(ApiConfigService)
   integrationService = inject(IntegrationService)
 
   constructor(private fb: FormBuilder) {
@@ -65,7 +65,12 @@ export class AddApiTokenComponent {
   }
 
   submit() {
-    if (this.form.invalid) return;
+    this.submitted = true;
+
+    if (this.form.invalid) {
+      return;
+    }
+
     const dto: CreateApiTokenDto = {
       integrationServiceId: this.form.value.integrationServiceId,
       descripcion: this.form.value.descripcion,
@@ -73,11 +78,14 @@ export class AddApiTokenComponent {
       apiKey: this.form.value.apiKey,
       serverUrl: this.form.value.serverUrl || undefined,
     };
-    console.log('DTO: ', dto);
-    this.apiConfig.createApiToken(dto).subscribe({
-      next: token => this.created.emit(token),
-      error: err => console.error('Error creando token:', err),
-    });
+
+    this.created.emit(dto)
+  }
+
+  onCancel(){
+    this.form.reset({ estado: 'conectado' });
+    this.submitted = false;
+    this.cancel.emit();
   }
 
 }
