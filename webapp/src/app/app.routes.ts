@@ -28,7 +28,7 @@ export const routes: Routes = [
         path: 'apis',
         canActivate: [privateGuard],
         loadComponent: () =>
-          import('./components/dahsboard/dahsboard.component'),
+          import('./components/api-config/api-config.component'),
       }
     ],
   },

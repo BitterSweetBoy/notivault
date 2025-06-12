@@ -1,0 +1,95 @@
+<tr class="border-b hover:bg-gray-50">
+  <!-- Columna: Servicio -->
+  <td class="p-4">
+    <div class="flex items-center">
+      <div
+        class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full mr-3"
+        [ngClass]="{
+          'bg-blue-100': token.servicio === 'Plane.so',
+          'bg-purple-100': token.servicio === 'Mattermost'
+        }"
+      >
+        <i
+          class="text-lg"
+          [ngClass]="{
+            'pi pi-globe text-blue-600': token.servicio === 'Plane.so',
+            'pi pi-comments text-purple-600': token.servicio === 'Mattermost'
+          }"
+        >
+        </i>
+      </div>
+      <div class="min-w-0 flex-1">
+        <p class="text-sm font-medium text-gray-900 truncate">
+          {{ token.servicio }}
+        </p>
+        <p class="text-sm text-gray-500 truncate">
+          {{ token.descripcion }}
+        </p>
+      </div>
+    </div>
+  </td>
+
+  <!-- Columna: Estado -->
+  <td class="p-4">
+    <span
+      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+      [ngClass]="{
+        'bg-green-100 text-green-800': token.estado === 'conectado',
+        'bg-red-100 text-red-800': token.estado === 'desconectado'
+      }"
+    >
+      <span
+        class="w-1.5 h-1.5 mr-1.5 rounded-full"
+        [ngClass]="{
+          'bg-green-400': token.estado === 'conectado',
+          'bg-red-400': token.estado === 'desconectado'
+        }"
+      >
+      </span>
+      {{ token.estado | titlecase }}
+    </span>
+  </td>
+
+  <!-- Columna: Última modificación -->
+  <td class="p-4 text-sm text-gray-900 whitespace-nowrap">
+    {{ token.ultimaModificacion | formatDate }}
+  </td>
+
+  <!-- Columna: Acciones -->
+  <td class="p-4">
+    <div class="flex items-center justify-center space-x-2">
+      <button
+        pButton
+        type="button"
+        icon="pi pi-pencil"
+        class="p-button-rounded p-button-text p-button-sm"
+        [ngClass]="'!text-blue-600 hover:!bg-blue-50'"
+        pTooltip="Editar"
+        tooltipPosition="top"
+        (click)="onEditClick()"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        icon="pi pi-trash"
+        class="p-button-rounded p-button-text p-button-sm"
+        [ngClass]="'!text-red-600 hover:!bg-red-50'"
+        pTooltip="Eliminar"
+        tooltipPosition="top"
+        (click)="onDeleteClick()"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        [icon]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+        class="p-button-rounded p-button-text p-button-sm"
+        [ngClass]="'!text-gray-600 hover:!bg-gray-50'"
+        pTooltip="Ver detalles"
+        tooltipPosition="top"
+        (click)="onToggleExpand()"
+      ></button>
+    </div>
+  </td>
+</tr>

@@ -1,0 +1,7 @@
+:host ::ng-deep .p-dialog .p-dialog-header {
+  @apply bg-gray-100 text-gray-800 font-semibold;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  @apply p-4;
+}
