@@ -1,0 +1,44 @@
+<tr>
+  <td colspan="4" class="p-0">
+    <div class="p-4 bg-gray-50 space-y-4">
+      <!-- Componente dinámico según el tipo -->
+      <ng-container *ngIf="token.servicio === 'Plane.so'">
+        <app-plane-token-config
+          [token]="token"
+          [isEditing]="isEditing"
+          (copy)="onCopy($event)"
+        ></app-plane-token-config>
+      </ng-container>
+
+      <ng-container *ngIf="token.servicio === 'Mattermost'">
+        <app-mattermost-token-config
+          [token]="token"
+          [isEditing]="isEditing"
+          (copy)="onCopy($event)"
+        ></app-mattermost-token-config>
+      </ng-container>
+
+      <!-- Botones globales -->
+      <div class="flex justify-end space-x-2" *ngIf="isEditing">
+        <button
+          pButton
+          type="submit"
+          label="Guardar"
+          severity="info"
+          icon="pi pi-check"
+          class="p-button-sm "
+          (click)="onSave()"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Cancelar"
+          severity="danger"
+          icon="pi pi-times"
+          class="p-button-sm"
+          (click)="onCancel()"
+        ></button>
+      </div>
+    </div>
+  </td>
+</tr>

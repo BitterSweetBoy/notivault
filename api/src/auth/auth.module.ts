@@ -21,5 +21,6 @@ import { LoginAttemptService } from './login-attempt.service';
       useClass: AuthGuard,
     },
   ],
+  exports: [SessionService]
 })
 export class AuthModule {}
