@@ -1,8 +1,28 @@
-<!-- URL del servidor -->
+<!-- Descripción -->
 <div class="space-y-2">
+  <h4 class="font-semibold text-gray-800">Descripción</h4>
+
+  <div *ngIf="!isEditing" class="bg-white p-3 rounded border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300">
+    <code class="text-sm text-gray-600 font-mono flex-1">
+      {{ token.descripcion || "" }}
+    </code>
+  </div>
+
+  <div *ngIf="isEditing">
+    <input
+      type="text"
+      [(ngModel)]="token.descripcion"
+      class="bg-white w-full p-3 text-sm border rounded border-gray-400 focus:outline-none focus:ring-indigo-300"
+      placeholder="Descripcion"
+    />
+  </div>
+</div>
+
+<!-- URL del servidor -->
+<div class="mt-4 space-y-2">
   <h4 class="font-semibold text-gray-800">URL del servidor de Mattermost</h4>
 
-  <div *ngIf="!isEditing" class="bg-white p-3 rounded border">
+  <div *ngIf="!isEditing" class="bg-white p-3 rounded border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300">
     <code class="text-sm text-gray-600">
       {{ token.serverUrl || "https://mattermost.tudominio.com" }}
     </code>
@@ -12,19 +32,19 @@
     <input
       type="text"
       [(ngModel)]="token.serverUrl"
-      class="w-full p-3 border rounded text-sm"
+      class="bg-white w-full p-3 text-sm border rounded border-gray-400 focus:outline-none focus:ring-indigo-300"
       placeholder="https://mattermost.tudominio.com"
     />
   </div>
 </div>
 
 <!-- API Key -->
-<div class="space-y-2">
+<div class="mt-4 space-y-2">
   <h4 class="font-semibold text-gray-800">Webhook de Mattermost</h4>
 
   <div
     *ngIf="!isEditing"
-    class="flex items-center justify-between bg-white p-3 rounded border"
+    class="flex items-center justify-between bg-white p-3 rounded border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300"
   >
     <code class="text-sm text-gray-600 font-mono flex-1">
       {{ token.apiKey }}
@@ -45,7 +65,7 @@
     <input
       type="text"
       [(ngModel)]="token.apiKey"
-      class="w-full p-3 border rounded text-sm font-mono"
+      class="bg-white w-full p-3 text-sm font-mono border rounded border-gray-400 focus:outline-none focus:ring-indigo-300"
       placeholder="Ingresa el API Key de Mattermost"
     />
   </div>
