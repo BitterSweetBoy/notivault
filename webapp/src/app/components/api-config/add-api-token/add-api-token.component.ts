@@ -30,7 +30,7 @@ export class AddApiTokenComponent {
       apiKey: ['', Validators.required],
       serverUrl: [''],
       descripcion: ['', Validators.required],
-      estado: ['conectado'],
+      estado: ['desconectado'],
     });
 
     this.form.get('integrationServiceId')!.valueChanges.subscribe(id => {

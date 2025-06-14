@@ -18,6 +18,24 @@
   </div>
 </div>
 
+<div class="mt-4 space-y-2">
+  <h4 class="font-semibold text-gray-800">URL Plane.so</h4>
+
+  <div *ngIf="!isEditing" class="bg-white p-3 rounded border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300">
+    <code class="text-sm text-gray-600">
+      {{ token.serverUrl }}
+    </code>
+  </div>
+
+  <div *ngIf="isEditing">
+    <input
+      type="text"
+      [(ngModel)]="token.serverUrl"
+      class="bg-white w-full p-3 text-sm border rounded border-gray-400 focus:outline-none focus:ring-indigo-300"
+    />
+  </div>
+</div>
+
 <div class="mt-4 space-y-4">
   <h4 class="font-semibold text-gray-800 mb-2">
     API Key de {{ token.servicio }}

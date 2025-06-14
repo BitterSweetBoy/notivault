@@ -24,7 +24,7 @@
 
   <div *ngIf="!isEditing" class="bg-white p-3 rounded border border-gray-300 rounded-lg focus:outline-none focus:ring-indigo-300">
     <code class="text-sm text-gray-600">
-      {{ token.serverUrl || "https://mattermost.tudominio.com" }}
+      {{ token.serverUrl }}
     </code>
   </div>
 
@@ -33,7 +33,6 @@
       type="text"
       [(ngModel)]="token.serverUrl"
       class="bg-white w-full p-3 text-sm border rounded border-gray-400 focus:outline-none focus:ring-indigo-300"
-      placeholder="https://mattermost.tudominio.com"
     />
   </div>
 </div>
