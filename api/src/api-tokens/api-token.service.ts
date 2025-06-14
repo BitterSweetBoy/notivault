@@ -4,11 +4,15 @@ import { CreateApiTokenDto } from './dtos/create-api-token.dto';
 import { UpdateApiTokenDto } from './dtos/update-api-token.dto';
 import { ApiTokenResponseDto } from './dtos/api-token-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { TokenStatusService } from './api-token-status.service';
 
 @Injectable()
 export class ApiTokenService {
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tokenStatusService: TokenStatusService
+  ) {}
 
   /** Devuelve todos los tokens mapeados a DTO */
   async findAll(): Promise<ApiTokenResponseDto[]> {
@@ -33,33 +37,79 @@ export class ApiTokenService {
   /** Crea un nuevo token y devuelve el DTO */
   async create(dto: CreateApiTokenDto): Promise<ApiTokenResponseDto> {
     const now = new Date();
-    const token = await this.prisma.apiToken.create({
+
+    const { nombre: serviceName } =
+      await this.prisma.integrationService.findUniqueOrThrow({
+        where: { id: dto.integrationServiceId },
+        select: { nombre: true },
+      });
+
+    // Normalizar el serverUrl
+    const serverUrl = this.normalizeServerUrl(serviceName, dto.serverUrl);
+
+    const created = await this.prisma.apiToken.create({
       data: {
         ...dto,
+        serverUrl,
         fechaConfiguracion: now,
         ultimaModificacion: now,
         ultimaVerificacion: now,
       },
       include: { integrationService: true },
     });
-    return this.toResponseDto(token);
+
+    // actualizar su estado
+    await this.tokenStatusService.validateToken(
+      created.id,
+      created.integrationService.nombre,
+      created.apiKey,
+      created.serverUrl,
+    );
+
+    const reloaded = await this.prisma.apiToken.findUniqueOrThrow({
+      where: { id: created.id },
+      include: { integrationService: true },
+    });
+
+    return this.toResponseDto(reloaded);
   }
 
   /** Actualiza el token y devuelve el DTO */
-  async update(
-    id: string,
-    dto: UpdateApiTokenDto,
-  ): Promise<ApiTokenResponseDto> {
-    await this.findOne(id);
+  async update( id: string, dto: UpdateApiTokenDto): Promise<ApiTokenResponseDto> {
+    const existing = await this.prisma.apiToken.findUniqueOrThrow({
+      where: { id },
+      include: { integrationService: true },
+    });
+
+    const serverUrl = this.normalizeServerUrl(
+      existing.integrationService.nombre,
+      dto.serverUrl,
+    );
+
     const updated = await this.prisma.apiToken.update({
       where: { id },
       data: {
         ...dto,
+        serverUrl,
         ultimaModificacion: new Date(),
       },
       include: { integrationService: true },
     });
-    return this.toResponseDto(updated);
+
+    // Validar y refrescar estado
+    await this.tokenStatusService.validateToken(
+      updated.id,
+      updated.integrationService.nombre,
+      updated.apiKey,
+      updated.serverUrl,
+    );
+
+    const reloaded = await this.prisma.apiToken.findUniqueOrThrow({
+      where: { id },
+      include: { integrationService: true },
+    });
+
+    return this.toResponseDto(reloaded);
   }
 
   /** Marca como inactivo el token */
@@ -90,6 +140,21 @@ export class ApiTokenService {
     return plainToInstance(ApiTokenResponseDto, raw, {
       excludeExtraneousValues: true,
     });
+  }
+
+  private normalizeServerUrl(
+    serviceName: string,
+    providedUrl?: string,
+  ): string | undefined {
+    const isEmpty = providedUrl === undefined || providedUrl.trim() === '';
+
+    if (isEmpty) {
+      return serviceName === 'Plane.so'
+        ? 'https://api.plane.so'
+        : undefined;
+    }
+
+    return providedUrl.trim();
   }
 
 }
